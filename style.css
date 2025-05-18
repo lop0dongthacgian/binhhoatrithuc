@@ -1,0 +1,545 @@
+/* Kiểu cơ bản cho trang */
+body {
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* Thay đổi nền từ gradient sang ảnh GIF */
+    background-image: url('images/Hoa.gif'); /* Đường dẫn đến ảnh GIF */
+    background-size: cover; /* Kéo dãn ảnh để phủ kín toàn bộ body */
+    background-position: center center; /* Căn giữa ảnh */
+    background-repeat: no-repeat; /* Không lặp lại ảnh */
+    background-attachment: fixed; /* Giữ ảnh nền cố định khi cuộn (nếu có) */
+    /* Giữ lại các thuộc tính khác */
+    color: #333;
+    margin: 0;
+    flex-direction: column; /* Xếp các container theo cột */
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto; /* Allow scrolling on the body if content overflows */
+}
+
+#quiz-modal {
+	display: none; /* Đảm bảo modal ẩn ban đầu */
+}
+
+/* --- Styles for Introduction Screen --- */
+#intro-screen {
+    display: flex; /* Initially display flex */
+    justify-content: center;
+    align-items: center;
+    position: fixed; /* Cover the entire viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0); /* Keep transparent background for the full overlay */
+    z-index: 1000; /* Ensure it's on top */
+    overflow-y: auto; /* Allow vertical scrolling within the intro screen if content is long */
+    padding: 20px; /* Add some padding around the content area */
+    box-sizing: border-box;
+}
+
+.intro-content {
+    background-color: rgba(255, 255, 255, 0.3); /* White background with 30% transparency */
+    padding: clamp(20px, 5vw, 40px) clamp(20px, 5vw, 30px); /* Responsive padding */
+    border-radius: 10px; /* Add some rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+    text-align: center;
+    color: red; /* Red text color */
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    max-width: 600px; /* Limit maximum width */
+    width: 95%; /* Make it responsive, slightly wider */
+    display: flex; /* Use flexbox for vertical arrangement */
+    flex-direction: column; /* Stack content vertically */
+    justify-content: center; /* Center content vertically within the flex container */
+    align-items: center; /* Center content horizontally */
+    min-height: 50vh; /* Set minimum height relative to viewport height */
+    box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+#intro-screen h1 {
+    color: red; /* Ensure heading is also red */
+    margin-top: 0; /* Remove top margin */
+    margin-bottom: clamp(15px, 3vw, 25px); /* Responsive bottom margin */
+    font-size: clamp(1.5em, 4vw, 1.8em); /* Responsive font size for heading */
+}
+
+#intro-screen p {
+    color: red; /* Ensure paragraphs are also red */
+    margin: clamp(5px, 1vw, 10px) 0; /* Responsive top/bottom margin */
+    font-size: clamp(0.8em, 1.8vw, 0.9em); /* Responsive font size for paragraphs */
+    line-height: 1.6; /* Improve readability with line spacing */
+}
+
+#start-game-button {
+    margin-top: clamp(20px, 5vw, 30px); /* Responsive top margin */
+    padding: clamp(15px, 4vw, 18px) clamp(30px, 6vw, 40px); /* Responsive padding for button */
+    font-size: clamp(1.2em, 3vw, 1.4em); /* Responsive font size for button text */
+    color: white;
+    background-color: #4CAF50; /* Green color */
+    border: none;
+    border-radius: 8px; /* More rounded corners */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); /* Add a more prominent shadow */
+    flex-shrink: 0; /* Prevent button from shrinking */
+}
+
+#start-game-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+#start-game-button:active {
+    background-color: #398439; /* Even darker green when clicked */
+    transform: translateY(0); /* Reset lift effect */
+}
+/* --- End Styles for Introduction Screen --- */
+
+
+/* Container chính cho trò chơi (ảnh và hoa) */
+.game-container {
+    /* background-color: #ffffff; */ /* Xóa hoặc ghi đè bằng transparent */
+    background-color: transparent; /* Làm cho nền trong suốt */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 95%;
+    max-width: 700px;
+    margin-bottom: 20px;
+    position: relative; /* Quan trọng: Các bông hoa con sẽ định vị tuyệt đối so với đây */
+    /* animation: fadeIn 0.8s ease-out; */ /* Có thể thêm lại animation nếu muốn */
+    display: none; /* Initially hide the game container */
+}
+
+/* Style cho phần hiển thị điểm và tiến độ */
+.game-stats {
+    margin-bottom: 20px;
+    font-size: 1.1em;
+    color: #7e22ce; /* Tím đậm */
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Đổ bóng nhẹ hơn */
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    font-weight: bold;
+
+    /* Thêm animation */
+    animation: fadeInScale 0.8s ease forwards;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+}
+
+/* Animation keyframes */
+@keyframes fadeInScale {
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Hiệu ứng khi hover */
+.game-stats:hover {
+    transform: scale(1.05);
+    color: #a855f7; /* Tím nhạt hơn khi hover */
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4); /* Đổ bóng nhẹ khi hover */
+}
+
+
+
+
+#score-display, #progress-display {
+    font-weight: bold; /* Có thể giữ lại hoặc xóa dòng này nếu đã thêm in đậm ở .game-stats */
+    margin: 5px; /* Khoảng cách nhỏ giữa 2 mục */
+}
+
+
+/* Container cho footer (đặt ở dưới cùng) */
+.footer-container {
+    background-color: transparent; /* Cũng làm trong suốt footer container nếu cần */
+    padding: 10px 20px; /* Padding nhỏ hơn */
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Có thể giữ bóng đổ */
+    text-align: center;
+    width: 95%;
+    max-width: 700px; /* Chiều rộng tương đương game-container */
+    margin-top: 20px; /* Khoảng cách với game-container */
+    display: none; /* Initially hide the footer container */
+}
+
+h1 {
+    color: #ff0000; /* Màu tiêu đề - Đã chuyển sang màu đỏ */
+    margin-bottom: 10px;
+    font-size: 2em;
+    font-weight: bold; /* Chữ đậm */
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7); /* Đổ bóng rõ hơn */
+}
+
+
+p {
+    color: #555; /* Giữ màu gốc cho các thẻ p khác nếu không có class riêng */
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+
+/* Kiểu riêng cho dòng hướng dẫn "Nhấp vào một bông hoa..." */
+.instruction-text {
+    color: yellow; /* Màu vàng đã chỉnh */
+    /* Các thuộc tính khác của thẻ p vẫn được kế thừa hoặc định nghĩa riêng */
+    font-size: 1.1em; /* Giữ kích thước font như p mặc định */
+    margin-bottom: 20px; /* Giữ margin như p mặc định */
+    font-weight: bold; /* Có thể thêm in đậm để dễ đọc hơn trên nền */
+    /* Bạn có thể cần điều chỉnh màu vàng (#ffff00) sang màu khác
+       như vàng đậm hơn (#ffd700 - gold) nếu nền GIF làm chữ khó đọc */
+    /* color: #ffd700; */ /* Ví dụ: màu vàng gold */
+}
+
+
+/* Vùng chứa ảnh chậu cây và các bông hoa */
+.plant-container {
+    position: relative; /* Quan trọng: Các bông hoa con sẽ định vị tuyệt đối so với đây */
+    display: inline-block; /* Để vùng chứa vừa với ảnh và căn giữa */
+    margin-top: 20px;
+}
+
+/* Ảnh chậu cây nền */
+.plant-image {
+    display: block; /* Loại bỏ khoảng trắng dưới ảnh */
+    max-width: 100%; /* Đảm bảo ảnh không tràn ra ngoài và co giãn theo container */
+    height: auto; /* Giữ tỷ lệ khung hình */
+}
+
+/* Kiểu chung cho các bông hoa ảo (vùng click) */
+.flower {
+    position: absolute; /* Định vị tuyệt đối so với plant-container */
+    width: 60px; /* Kích thước vùng click của hoa */
+    height: 60px; /* Kích thước vùng click của hoa */
+    border-radius: 50%; /* Tạo hình tròn cho vùng click */
+    cursor: pointer; /* Hiển thị con trỏ dạng bàn tay khi rê chuột */
+    z-index: 10; /* Đảm bảo bông hoa nằm trên ảnh nền và ảnh chậu cây */
+
+    /* --- TẠM THỜI HIỂN THỊ VÙNG CLICK ĐỂ DỄ ĐỊNH VỊ --- */
+    /* Sau khi định vị xong, hãy comment hoặc xóa 2 dòng dưới */
+     /* background-color: rgba(255, 0, 0, 0.4); /* Màu đỏ mờ */
+     /* border: 2px dashed blue; /* Viền xanh nét đứt */
+}
+
+.flower:hover {
+    transform: scale(1.1); /* Phóng to nhẹ khi hover tạo hiệu ứng */
+}
+
+
+/* --- Định vị từng bông hoa DỰA TRÊN ẢNH HOA.JPG (Cần tinh chỉnh lại bằng Developer Tools) --- */
+/* Đã lấy các giá trị ước tính mới từ file style.css bạn cung cấp */
+.flower-1 { top: 27%; left: 28%; } /* Hoa trên cùng bên trái */
+.flower-2 { top: 41%; left: 7%; } /* Hoa giữa bên trái */
+.flower-3 { top: 7%; left: 41%; } /* Hoa trên cùng giữa */
+.flower-4 { top: 21%; left: 63%; } /* Hoa giữa bên phải */
+.flower-5 { top: 44%; left: 77%; } /* Hoa dưới cùng bên phải */
+
+
+/* --- Kiểu cho Modal (Cửa sổ bật lên chứa câu hỏi) --- */
+.modal {
+    display: none; /* Ẩn modal ban đầu - Đảm bảo dòng này CÓ */
+    position: fixed; /* Đặt modal cố định trên trang */
+    z-index: 1000; /* Đảm bảo modal nằm trên cùng, che hết nội dung khác */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Cho phép cuộn nếu nội dung modal dài hơn màn hình */
+    background-color: rgba(0,0,0,0.6); /* Nền mờ làm tối phần còn lại của trang */
+    display: flex; /* Sử dụng flexbox để dễ dàng căn giữa nội dung */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto; /* Cũng giúp căn giữa */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    width: 90%; /* Chiều rộng modal */
+    max-width: 600px; /* Chiều rộng tối đa */
+    position: relative; /* Để nút đóng modal định vị tuyệt đối bên trong */
+    text-align: left; /* Căn trái nội dung modal */
+}
+
+/* Nút đóng modal */
+.close-button {
+    color: #aaa;
+    float: right; /* Đẩy sang phải */
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute; /* Định vị tuyệt đối */
+    top: 10px;
+    right: 20px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #777;
+    text-decoration: none;
+}
+
+/* Kiểu cho văn bản câu hỏi */
+#question-text {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+/* Vùng chứa các lựa chọn trả lời */
+#answer-options {
+    margin-bottom: 15px;
+}
+
+/* Kiểu cho các nút đáp án */
+.answer-button {
+    display: block; /* Mỗi đáp án trên một dòng */
+    width: 100%; /* Chiều rộng 100% của vùng chứa */
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #eee;
+    font-size: 1.1em;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.answer-button:hover {
+    background-color: #ddd;
+    border-color: #bbb;
+}
+
+/* Kiểu khi đáp án được chọn */
+.answer-button.selected {
+     border-color: #007bff; /* Viền màu xanh */
+     background-color: #e9f5ff; /* Nền màu xanh nhạt */
+     font-weight: bold;
+}
+
+/* Vùng hiển thị phản hồi (đúng/sai/hết giờ) */
+#feedback {
+    font-size: 1.2em; /* Tăng kích thước font */
+    font-weight: bold; /* In đậm */
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.feedback-correct {
+    color: #388E3C; /* Màu xanh cho feedback đúng */
+    background-color: #E8F5E9; /* Nền xanh nhạt */
+}
+
+.feedback-wrong {
+    color: #D32F2F; /* Màu đỏ cho feedback sai */
+    background-color: #FFEBEE; /* Nền đỏ nhạt */
+}
+
+.feedback-timeout {
+    color: #FFA000; /* Màu cam cho feedback hết giờ */
+    background-color: #FFF3E0; /* Nền cam nhạt */
+}
+
+
+/* Nút "Câu hỏi tiếp theo" */
+#next-question-button {
+    display: block;
+    width: 100%;
+    padding: 12px 15px;
+    margin-top: 15px;
+    background-color: #28a745; /* Màu xanh lá cây */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#next-question-button:hover {
+    background-color: #218838;
+}
+
+/* Class để ẩn phần tử */
+.hidden {
+    display: none;
+}
+
+/* --- Kiểu cho Bộ đếm thời gian --- */
+#timer-container {
+    text-align: right;
+    font-size: 1.1em;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+#timer-display {
+    font-size: 1.2em; /* Kích thước số lớn hơn */
+}
+
+.timer-blue {
+    color: blue;
+}
+
+.timer-red {
+    color: red;
+}
+
+/* Kiểu cho nút đáp án khi bị vô hiệu hóa */
+.answer-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.footer-text {
+    color: #FF0000; /* Màu tên tác giả - Đã chuyển sang màu đỏ */
+    font-size: 1em;
+    text-align: center;
+    margin: 0;
+    font-weight: bold;
+    text-shadow:
+        1px 1px 2px rgba(0, 0, 0, 0.25),
+        2px 2px 4px rgba(0, 0, 0, 0.2),
+        3px 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+
+
+
+/* --- Cập nhật Kiểu cho nút bật/tắt nhạc (Di chuyển lên trên bên phải) --- */
+#music-toggle-button {
+    position: fixed; /* Giữ nút cố định trên màn hình */
+    top: 20px; /* <<< Thay đổi từ bottom sang top */
+    right: 20px; /* <<< Thay đổi từ left sang right */
+    z-index: 1001; /* Đảm bảo nút nằm trên các phần tử khác */
+    padding: 10px 15px; /* Padding */
+    font-size: 1em; /* Kích thước font chữ */
+    background-color: rgba(0, 123, 255, 0.8); /* Màu xanh dương hơi trong suốt */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Thêm border-radius để khớp với nút thoát */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Thêm đổ bóng nhẹ */
+}
+
+#music-toggle-button:hover {
+    background-color: rgba(0, 86, 179, 0.9); /* Đậm hơn khi hover */
+}
+
+/* Chỉnh sửa luật CSS cho nút Thoát trò chơi - Đã di chuyển lên trên bên trái và nhỏ lại */
+#exit-game-button {
+    position: fixed; /* Giữ nút cố định trên màn hình */
+    top: 20px; /* Đặt ở phía trên */
+    left: 20px; /* Đặt ở phía bên trái */
+    padding: 10px 15px; /* Điều chỉnh padding bằng với nút bật nhạc */
+    background-color: #f44336; /* Màu đỏ */
+    color: white;
+    border: none;
+    border-radius: 5px; /* Điều chỉnh border-radius bằng với nút bật nhạc */
+    cursor: pointer;
+    font-size: 1em; /* Điều chỉnh font-size bằng với nút bật nhạc */
+    font-weight: bold; /* Giữ in đậm chữ */
+    z-index: 1001; /* Đảm bảo nút nằm trên các phần tử khác */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Điều chỉnh đổ bóng bằng với nút bật nhạc */
+    transition: background-color 0.3s ease, transform 0.1s ease; /* Hiệu ứng chuyển đổi */
+}
+
+#exit-game-button:hover {
+    background-color: #d32f2f; /* Màu đỏ đậm hơn khi hover */
+    transform: scale(1.05); /* Phóng to nhẹ khi hover */
+}
+
+#exit-game-button:active {
+    background-color: #c62828; /* Màu đỏ đậm nhất khi click */
+    transform: scale(0.98); /* Thu nhỏ nhẹ khi click */
+}
+
+/* CSS cho màu sắc câu trả lời */
+.answer-button.correct-answer {
+    background-color: #4CAF50; /* Màu xanh lá cây */
+    color: white;
+    border-color: #388E3C;
+}
+
+.answer-button.wrong-answer {
+    background-color: #F44336; /* Màu đỏ */
+    color: white;
+    border-color: #D32F2F;
+}
+
+/* CSS cho feedback nổi bật */
+#feedback {
+    font-size: 1.2em; /* Tăng kích thước font */
+    font-weight: bold; /* In đậm */
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.feedback-correct {
+    color: #388E3C; /* Màu xanh cho feedback đúng */
+    background-color: #E8F5E9; /* Nền xanh nhạt */
+}
+
+.feedback-wrong {
+    color: #D32F2F; /* Màu đỏ cho feedback sai */
+    background-color: #FFEBEE; /* Nền đỏ nhạt */
+}
+
+.feedback-timeout {
+    color: #FFA000; /* Màu cam cho feedback hết giờ */
+    background-color: #FFF3E0; /* Nền cam nhạt */
+}
+
+/* CSS cho hiệu ứng làm mờ */
+.dimmed {
+    opacity: 0.3; /* Giảm độ mờ nhiều hơn */
+    filter: blur(5px); /* Áp dụng hiệu ứng làm mờ mạnh hơn */
+    pointer-events: none; /* Vô hiệu hóa sự kiện click trên các phần tử bị làm mờ */
+    transition: opacity 0.5s ease, filter 0.5s ease; /* Hiệu ứng chuyển đổi mượt mà hơn */
+}
+
+
+/* --- Style for Play Again Button --- */
+#play-again-button {
+    position: fixed; /* Fixed position */
+    bottom: 40px; /* Position from the bottom */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust for perfect centering */
+    z-index: 1001; /* Ensure it's on top */
+    padding: 15px 30px; /* Sufficient padding */
+    font-size: 1.3em; /* Readable font size */
+    color: white;
+    background-color: #007bff; /* Blue color */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#play-again-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: translateX(-50%) translateY(-2px); /* Lift effect */
+}
+
+#play-again-button:active {
+     background-color: #004085; /* Even darker blue when clicked */
+     transform: translateX(-50%) translateY(0); /* Reset lift effect */
+}
+/* --- End Style for Play Again Button --- */
